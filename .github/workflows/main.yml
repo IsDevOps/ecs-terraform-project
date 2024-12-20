@@ -2,6 +2,10 @@
 name: CI/CD Pipeline
 
 on:
+  push:
+    branches:
+      - master
+    
   workflow_dispatch:
     inputs:
       action:
@@ -33,8 +37,8 @@ jobs:
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          - name: Checkout repository
+          uses: actions/checkout@v4
           
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -81,3 +85,4 @@ jobs:
         if: ${{ github.event.inputs.action == 'destroy' }}
         
         run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+  
