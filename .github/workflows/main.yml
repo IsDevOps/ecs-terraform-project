@@ -51,5 +51,16 @@ jobs:
         run: terraform validate
 
       - name: Run Terraform Command
+        env:
+          TF_ACTION: ${{ github.event.inputs.action }}
         run: |
-          terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+          if [[ "$TF_ACTION" == "plan" ]]; then
+            terraform plan -input=false
+          elif [[ "$TF_ACTION" == "apply" ]]; then
+            terraform apply -auto-approve -input=false
+          elif [[ "$TF_ACTION" == "destroy" ]]; then
+            terraform destroy -auto-approve -input=false
+          else
+            echo "Invalid action: $TF_ACTION"
+            exit 1
+          fi
