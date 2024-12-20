@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-    
+
   workflow_dispatch:
     inputs:
       action:
@@ -51,9 +51,11 @@ jobs:
         run: terraform validate
 
       - name: Run Terraform Command
+        env:
+          TF_ACTION: ${{ github.event.inputs.action || 'apply' }}
         run: |
-          echo "Selected action: ${{ github.event.inputs.action }}"
-          case "${{ github.event.inputs.action }}" in
+          echo "Selected action: $TF_ACTION"
+          case "$TF_ACTION" in
             plan)
               terraform plan -input=false
               ;;
@@ -64,7 +66,7 @@ jobs:
               terraform destroy -auto-approve -input=false
               ;;
             *)
-              echo "Invalid action: ${{ github.event.inputs.action }}"
+              echo "Invalid action: $TF_ACTION"
               exit 1
               ;;
           esac
