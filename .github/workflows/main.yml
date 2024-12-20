@@ -64,5 +64,10 @@ jobs:
 
       - name: Perform Terraform Action
         run: |
-          terraform ${{ github.event.inputs.terraform_action }} -auto-approve
+          if [ "${{ github.event.inputs.terraform_action }}" = "destroy" ]; then
+            terraform destroy -auto-approve
+          else
+            terraform apply -auto-approve
+          fi
         working-directory: terraform
+      
