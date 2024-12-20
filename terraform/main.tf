@@ -7,13 +7,13 @@ module "vpc" {
 module "ecs" {
   source            = "./modules/ecs"
   container_image   = "oseghale1/flask-app:latest"
-  subnet_ids        = module.networking.subnet_ids
-  security_group_id = module.networking.ecs_security_group_id
+  subnet_ids        = module.vpc.subnet_ids
+  security_group_id = module.vpc.ecs_security_group_id
 }
 
 module "alb" {
   source            = "./modules/alb"
-  vpc_id            = module.networking.vpc_id
-  subnet_ids        = module.networking.subnet_ids
-  security_group_id = module.networking.ecs_security_group_id
+  vpc_id            = module.vpc.vpc_id
+  subnet_ids        = module.vpc.subnet_ids
+  security_group_id = module.vpc.ecs_security_group_id
 }
