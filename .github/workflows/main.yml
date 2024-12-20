@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Build and Push Docker Image
         run: |
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.6.0 # Specify the Terraform version you want
+          terraform_version: 1.10.3
 
       - name: Initialize Terraform
         run: terraform init
