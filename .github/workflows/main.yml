@@ -1,1 +1,32 @@
 
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t oseghale1/flask-app:latest ./app
+          docker push oseghale1/flask-app:latest
+
+      - name: Deploy infrastructure with Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve
