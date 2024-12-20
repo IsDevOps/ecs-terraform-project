@@ -2,8 +2,8 @@ resource "aws_ecs_cluster" "main" {
   name = "ecs-cluster"
 }
 
-resource "aws_ecs_task_definition" "main" {
-  family                   = "ecs-task"
+resource "aws_ecs_task_definition" "api_task" {
+  family                   = "api-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -11,28 +11,37 @@ resource "aws_ecs_task_definition" "main" {
 
   container_definitions = jsonencode([
     {
-      name      = "app"
-      image     = var.container_image
+      name      = "api-container"
+      image     = "oseghale1/flask-app"
       cpu       = 256
       memory    = 512
       essential = true
       portMappings = [
         {
-          containerPort = 5000
-          hostPort      = 5000
+          containerPort = 80
+          hostPort      = 80
+          protocol      = "tcp"
         }
       ]
     }
   ])
 }
 
-resource "aws_ecs_service" "main" {
+resource "aws_ecs_service" "api_service" {
+  name            = "api-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.main.arn
-  launch_type     = "FARGATE"
+  task_definition = aws_ecs_task_definition.api_task.arn
 
   network_configuration {
-    subnets         = var.subnet_ids
-    security_groups = [var.security_group_id]
+    subnets         = var.public_subnets
+    security_groups = var.security_groups
+  }
+
+  desired_count          = 1
+  launch_type            = "FARGATE"
+  load_balancer {
+    target_group_arn = var.alb_target_group_arn
+    container_name   = "api-container"
+    container_port   = 80
   }
 }

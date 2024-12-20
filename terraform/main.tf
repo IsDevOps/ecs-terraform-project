@@ -1,19 +1,23 @@
-module "vpc" {
-  source       = "./modules/vpc"
-  cidr_block   = "10.0.0.0/16"
-  subnet_count = 2
+module "networking" {
+  source = "./modules/vpc"
 }
 
-module "ecs" {
-  source            = "./modules/ecs"
-  container_image   = "oseghale1/flask-app:latest"
-  subnet_ids        = module.vpc.subnet_ids
-  security_group_id = module.vpc.ecs_security_group_id
+module "security_groups" {
+  source = "./modules/security_groups"
+  vpc_id = module.networking.vpc_id
 }
 
 module "alb" {
-  source            = "./modules/alb"
-  vpc_id            = module.vpc.vpc_id
-  subnet_ids        = module.vpc.subnet_ids
-  security_group_id = module.vpc.ecs_security_group_id
+  source          = "./modules/alb"
+  vpc_id          = module.networking.vpc_id
+  public_subnets  = module.networking.public_subnets
+  security_groups = [module.security_groups.ecs_sg_id]
+}
+
+module "ecs" {
+  source          = "./modules/ecs"
+  vpc_id          = module.networking.vpc_id
+  public_subnets  = module.networking.public_subnets
+  security_groups = [module.security_groups.ecs_sg_id]
+  alb_target_group_arn = module.alb.target_group_arn
 }
