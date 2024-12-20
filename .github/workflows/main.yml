@@ -39,7 +39,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 1.10.3
+          terraform_version: 1.6.0
 
       - name: Initialize Terraform
         run: terraform init
@@ -50,5 +50,6 @@ jobs:
       - name: Validate Terraform Configuration
         run: terraform validate
 
-      - name: Run Terraform Action
-        run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+      - name: Run Terraform Command
+        run: |
+          terraform ${{ github.event.inputs.action }} -auto-approve -input=false
