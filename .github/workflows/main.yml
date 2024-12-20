@@ -5,6 +5,18 @@ on:
   push:
     branches:
       - master
+    
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        description: 'Apply or Destroy'
+        options:
+        - plan
+        - apply
+        - destroy
+        required: true
+        default: 'apply'
 
 jobs:
   build-and-deploy:
@@ -25,95 +37,51 @@ jobs:
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
-      Setting-Up-Terraform:
-    runs-on: ubuntu-latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
+          
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+          
+            
+      - name: Terraform Init          
+        run: terraform init
+          
+        # Checks that all Terraform configuration files adhere to a canonical format
+      - name: Terraform Format
+        run: terraform fmt
     
-    needs: CheckOut-Repo
+      - name: Terraform Validate          
+        run: terraform validate
 
-    steps:
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-        
-
-  Terraform-Initializing:
-    runs-on: ubuntu-latest
-
-    needs: Setting-Up-Terraform
-
-    steps:
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      
-      
-        
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
-
-  Terraform-Formatting-Validating:
-    runs-on: ubuntu-latest
-    needs: Terraform-Initializing
-
-    steps:
-        
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
       
         
-    - name: Terraform Init
+  
+      - name: Terraform Init
+       
+        run: terraform init
+  
+        
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action  == 'plan' }}
+        
+        # Generates an execution plan for Terraform
+        run: |
+          terraform plan -input=false
+  
       
-      run: terraform init
-      
-    # Checks that all Terraform configuration files adhere to a canonical format
-    - name: Terraform Format
-      run: terraform fmt
-
-    - name: Terraform Validate
-      
-      run: terraform validate
-
-  Terraform-Action:
-    runs-on: ubuntu-latest
-    needs: Terraform-Formatting-Validating
-    
-    steps:
-
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-    
-      
-
-    - name: Terraform Init
-     
-      run: terraform init
-
-      
-    - name: Terraform Plan
-      if: ${{ github.event.inputs.action  == 'plan' }}
-      
-      # Generates an execution plan for Terraform
-      run: |
-        terraform plan -input=false
-
-    
-      # Apply the Terraform Configuration according to the parameter
-    - name: Terraform Action
-      if: ${{ github.event.inputs.action  == 'apply' }}
-      
-      run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
-
-    - name: Terraform Destroy
-      if: ${{ github.event.inputs.action == 'destroy' }}
-      
-      run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+        # Apply the Terraform Configuration according to the parameter
+      - name: Terraform Action
+        if: ${{ github.event.inputs.action  == 'apply' }}
+        
+        run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+  
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        
+        run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
