@@ -37,8 +37,8 @@ jobs:
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
-          - name: Checkout repository
-          uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
           
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
