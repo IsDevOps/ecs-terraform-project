@@ -27,6 +27,5 @@ jobs:
 
       - name: Deploy infrastructure with Terraform
         run: |
-          cd terraform
           terraform init
           terraform apply -auto-approve
