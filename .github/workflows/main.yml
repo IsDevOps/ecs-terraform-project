@@ -24,6 +24,20 @@ jobs:
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
+          - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v1
+          with:
+            terraform_version: 1.6.0
+  
+      - name: Initialize Terraform
+        run: terraform init
+  
+      - name: Format Terraform Configuration
+        run: terraform fmt
+  
+      - name: Validate Terraform Configuration
+        run: terraform validate
+
       - name: Deploy infrastructure with Terraform
         run: |
           cd terraform
