@@ -6,7 +6,7 @@ module "vpc" {
 
 module "ecs" {
   source            = "./terraform/modules/ecs"
-  container_image   = "your-dockerhub-repo/flask-app:latest"
+  container_image   = "oseghale1/flask-app:latest"
   subnet_ids        = module.networking.subnet_ids
   security_group_id = module.networking.ecs_security_group_id
 }
