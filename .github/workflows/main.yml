@@ -46,20 +46,23 @@ jobs:
 
       - name: Initialize Terraform
         run: |
-          cd terraform
           terraform init
+        working-directory: terraform
+
 
       - name: Format Terraform Configuration
         run: |
-          cd terraform
           terraform fmt
+        working-directory: terraform
+
 
       - name: Validate Terraform Configuration
         run: |
-          cd terraform
           terraform validate
+        working-directory: terraform
+
 
       - name: Perform Terraform Action
         run: |
-          cd terraform
           terraform ${{ github.event.inputs.terraform_action }} -auto-approve
+        working-directory: terraform
