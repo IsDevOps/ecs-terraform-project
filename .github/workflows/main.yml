@@ -1,9 +1,12 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: 'Terraform action to perform (apply or destroy)'
+        required: true
+        default: 'apply'
 
 jobs:
   build-and-deploy:
@@ -28,25 +31,30 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 1.6.0
-  
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Initialize Terraform
-        run: terraform init
-  
-      - name: Format Terraform Configuration
-        run: terraform fmt
-  
-      - name: Validate Terraform Configuration
-        run: terraform validate
-
-      - name: Deploy infrastructure with Terraform
         run: |
           cd terraform
           terraform init
-          terraform apply -auto-approve
+
+      - name: Format Terraform Configuration
+        run: |
+          cd terraform
+          terraform fmt
+
+      - name: Validate Terraform Configuration
+        run: |
+          cd terraform
+          terraform validate
+
+      - name: Perform Terraform Action
+        run: |
+          cd terraform
+          terraform ${GITHUB_EVENT_INPUTS_TERRAFORM_ACTION} -auto-approve

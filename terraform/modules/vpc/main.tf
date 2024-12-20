@@ -1,6 +1,9 @@
 resource "aws_vpc" "main" {
-  name       = "test-vpc"
   cidr_block = "10.0.0.0/16"
+
+  tag ={
+    name = "ecs-vpc"
+  }
 }
 
 resource "aws_subnet" "public_subnets" {
