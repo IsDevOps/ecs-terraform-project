@@ -22,7 +22,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t oseghale1/flask-app:latest ./app
+          docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
       - name: Deploy infrastructure with Terraform
