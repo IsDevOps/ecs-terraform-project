@@ -42,7 +42,7 @@ jobs:
       - name: Format Terraform Configuration
         run: terraform fmt
   
-      - name: Validate Terraform Configurations
+      - name: Validate Terraform Configuration
         run: terraform validate
 
       - name: Deploy infrastructure with Terraform
