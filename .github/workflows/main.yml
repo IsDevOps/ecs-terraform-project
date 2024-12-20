@@ -31,6 +31,7 @@ jobs:
             terraform_version: 1.10.3
 
       - name: Deploy infrastructure with Terraform
-        run: |
+        run:
+          cd terraform
           terraform init
           terraform apply -auto-approve
