@@ -35,14 +35,14 @@ jobs:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: us-east-1
-            
+
       - name: Initialize Terraform
         run: terraform init
   
       - name: Format Terraform Configuration
         run: terraform fmt
   
-      - name: Validate Terraform Configuration
+      - name: Validate Terraform Configurations
         run: terraform validate
 
       - name: Deploy infrastructure with Terraform
