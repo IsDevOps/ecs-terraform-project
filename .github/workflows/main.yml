@@ -12,67 +12,115 @@ on:
         default: 'apply'
 
 jobs:
-  build-and-deploy:
+  CheckOut-Repo:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      AWS_REGION: eu-north-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+    
+    # needs: terraform
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref }}
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  Setting-Up-Terraform:
+    runs-on: ubuntu-latest
+    
+    needs: CheckOut-Repo
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t oseghale1/flask-app:latest ./application
-          docker push oseghale1/flask-app:latest
+    steps:
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+        
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.6.0
+  Terraform-Initializing:
+    runs-on: ubuntu-latest
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+    needs: Setting-Up-Terraform
 
-      - name: Initialize Terraform
-        run: |
-          terraform init
-        working-directory: terraform
+    steps:
 
-
-      - name: Format Terraform Configuration
-        run: |
-          terraform fmt
-        working-directory: terraform
-
-
-      - name: Validate Terraform Configuration
-        run: |
-          terraform validate
-        working-directory: terraform
-
-
-      - name: Perform Terraform Action
-        run: |
-          if [ "${{ github.event.inputs.terraform_action }}" = "destroy" ]; then
-            terraform destroy -auto-approve
-          else
-            terraform apply -auto-approve
-          fi
-        working-directory: terraform
-
-      - name: Destroy Infrastructure
-        run: |
-          terraform destroy -auto-approve
-        working-directory: terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
       
+      
+        
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+  Terraform-Formatting-Validating:
+    runs-on: ubuntu-latest
+    needs: Terraform-Initializing
+
+    steps:
+        
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      
+        
+    - name: Terraform Init
+      
+      run: terraform init
+      
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt
+
+    - name: Terraform Validate
+      
+      run: terraform validate
+
+  Terraform-Action:
+    runs-on: ubuntu-latest
+    needs: Terraform-Formatting-Validating
+    
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+    
+      
+
+    - name: Terraform Init
+     
+      run: terraform init
+
+      
+    - name: Terraform Plan
+      if: ${{ github.event.inputs.action  == 'plan' }}
+      
+      # Generates an execution plan for Terraform
+      run: |
+        terraform plan -input=false
+
+    
+      # Apply the Terraform Configuration according to the parameter
+    - name: Terraform Action
+      if: ${{ github.event.inputs.action  == 'apply' }}
+      
+      run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
+
+    - name: Terraform Destroy
+      if: ${{ github.event.inputs.action == 'destroy' }}
+      
+      run: terraform ${{ github.event.inputs.action }} -auto-approve -input=false
