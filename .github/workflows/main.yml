@@ -1,6 +1,9 @@
 name: CI/CD Pipeline
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
     inputs:
       terraform_action:
@@ -15,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
 
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -57,4 +62,4 @@ jobs:
       - name: Perform Terraform Action
         run: |
           cd terraform
-          terraform ${GITHUB_EVENT_INPUTS_TERRAFORM_ACTION} -auto-approve
+          terraform ${{ github.event.inputs.terraform_action }} -auto-approve
