@@ -25,6 +25,11 @@ jobs:
           docker build -t oseghale1/flask-app:latest ./application
           docker push oseghale1/flask-app:latest
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+            terraform_version: 1.10.3
+
       - name: Deploy infrastructure with Terraform
         run: |
           terraform init
