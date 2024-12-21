@@ -32,9 +32,14 @@ resource "aws_ecs_service" "api_service" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.api_task.arn
 
-  network_configuration {
+  # network_configuration {
+  #   subnets         = var.public_subnets
+  #   security_groups = var.security_groups
+  # }
+   network_configuration {
     subnets         = var.public_subnets
-    security_groups = var.security_groups
+    security_groups = [aws_security_group.ecs_security_group.id]
+    assign_public_ip = "ENABLED" 
   }
 
   desired_count          = 1
