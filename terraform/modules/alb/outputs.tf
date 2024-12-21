@@ -5,3 +5,6 @@ output "alb_dns_name" {
 output "target_group_arn" {
   value = aws_alb_target_group.main.arn
 }
+output "target_id" {
+  value = aws_ecs_service.main.id
+}
