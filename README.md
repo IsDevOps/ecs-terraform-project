@@ -1,4 +1,3 @@
-```markdown
 # ECS Terraform Project
 
 ## Overview
@@ -33,4 +32,3 @@ Deploys a Flask application to AWS ECS using Terraform and a GitHub Actions CI/C
    Destroy
    ```
 3. Access the application via the ALB URL.
-``
