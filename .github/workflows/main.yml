@@ -5,10 +5,6 @@ on:
         description: 'Terraform action to perform (apply or destroy)'
         required: true
         default: 'apply'
-  push:
-      branches:
-        - master
-
 
 jobs:
   build-and-deploy:
@@ -70,8 +66,8 @@ jobs:
           fi
         working-directory: terraform
 
-      - name: Destroy Infrastructure
-        run: |
-          terraform destroy -auto-approve
-        working-directory: terraform
+      # - name: Destroy Infrastructure
+      #   run: |
+      #     terraform destroy -auto-approve
+      #   working-directory: terraform
       
