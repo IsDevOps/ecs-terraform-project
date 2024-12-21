@@ -31,3 +31,8 @@ resource "aws_alb_listener" "http" {
     target_group_arn = aws_alb_target_group.main.arn
   }
 }
+resource "aws_lb_target_group_attachment" "main" {
+  target_group_arn = aws_lb_target_group.main.arn
+  target_id        = aws_ecs_service.main.id
+  port             = 5000
+}
