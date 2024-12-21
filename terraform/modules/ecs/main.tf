@@ -18,8 +18,8 @@ resource "aws_ecs_task_definition" "api_task" {
       essential = true
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 5000
+          hostPort      = 5000
           protocol      = "tcp"
         }
       ]
@@ -45,6 +45,6 @@ resource "aws_ecs_service" "api_service" {
   load_balancer {
     target_group_arn = var.alb_target_group_arn
     container_name   = "api-container"
-    container_port   = 80
+    container_port   = 5000
   }
 }
