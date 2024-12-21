@@ -66,8 +66,4 @@ jobs:
           fi
         working-directory: terraform
 
-      # - name: Destroy Infrastructure
-      #   run: |
-      #     terraform destroy -auto-approve
-      #   working-directory: terraform
       
