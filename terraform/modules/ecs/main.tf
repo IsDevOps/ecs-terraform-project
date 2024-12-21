@@ -35,7 +35,7 @@ resource "aws_ecs_service" "api_service" {
   network_configuration {
     subnets         = var.public_subnets
     security_groups = var.security_groups
-    assign_public_ip = "ENABLED" 
+    assign_public_ip = true 
 
   }
   
