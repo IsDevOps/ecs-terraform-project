@@ -1,5 +1,5 @@
 
-resource "aws_security_group" "ecs_security_group" {
+resource "aws_security_group" "ecs_sg" {
   vpc_id = var.vpc_id
   name        = "ecs-sg"
   description = "Allow ECS task traffic"
